@@ -2,7 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Browser graphql demo</title>
+    <meta name="author" content="Mudit">
+    <meta name="description" content="Running GraphQL in the browser without a server.">
+    <meta name="keywords" content="GraphQL, mudit, browser, serverless">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FB related meta tags -->
+    <meta property="og:title" content="Running GraphQL in the browser without a server."/>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://browser-graphql.zdx.cat">
+    <meta property="og:description" content="Running GraphQL in the browser without a server.">
+
+    <!-- Twitter related meta tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="https://browser-graphql.zdx.cat">
+    <meta name="twitter:title" content="Running GraphQL in the browser without a server.">
+    <meta name="twitter:description" content="Running GraphQL in the browser without a server.">
+    <link href="./favicon.ico" rel="icon" type="image/ico" />
+
+    <title>Browser GraphQL demo</title>
     <style>
       * {
         box-sizing: border-box;
@@ -13,8 +31,8 @@
         padding: 0;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
-          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+        sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       }
       main {
         padding: 2rem 5rem;
@@ -36,6 +54,16 @@
         margin: 1rem 0 0;
         height: 40px;
         width: 100px;
+        cursor: pointer;
+      }
+      .github-link {
+        display: flex;
+        align-items: center;
+        margin-top: 1rem;
+        width: fit-content;
+      }
+      .github-link > p {
+        margin-right: 0.5rem;
       }
       .input,
       .output,
@@ -77,11 +105,32 @@
   </head>
   <body>
     <main>
-      <h1>Try out graphql fully running in the browser</h1>
+      <h1>Try out graphql running fully in the browser</h1>
       <em
-        >Please note that all query delays are synthetic and emulated to show async/await support in
+      >Please note that all query delays are synthetic and emulated to show async/await support in
         resolvers.</em
+                  >
+      <a
+        class="github-link"
+        href="https://github.com/zeusdeux/browser-graphql"
+        target="_blank"
+        rel="noreferrer nofollow"
       >
+        <p>View source on</p>
+        <svg
+          class="github-mark"
+          height="32"
+          viewBox="0 0 16 16"
+          version="1.1"
+          width="32"
+          aria-hidden="true"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+          ></path>
+        </svg>
+      </a>
       <div class="editor">
         <div class="input">
           <form id="input-form">
@@ -248,16 +297,16 @@ mutation {
     <script type="text/javascript" src="./browser-gql.umd.js"></script>
     <script type="text/javascript">
       function getQueryRunner() {
-        const AuthorDB = {}
-        const BookDB = {}
+        const AuthorDB = {};
+        const BookDB = {};
 
-        const gql = String.raw
+        const gql = String.raw;
 
         const delay = ms => {
           return new Promise(res => {
-            setTimeout(res, ms)
-          })
-        }
+            setTimeout(res, ms);
+          });
+        };
 
         const typeDefs = gql`
           type Query {
@@ -295,24 +344,24 @@ mutation {
             addAuthor(author: AuthorInput!): Author!
             addBookForAuthor(authorName: String!, book: BookInput): Book!
           }
-        `
+        `;
 
         const resolvers = {
           Query: {
             authors() {
-              return Object.values(AuthorDB)
+              return Object.values(AuthorDB);
             },
             async author(_, { name }) {
-              await delay(3000)
+              await delay(2000);
 
               if (name in AuthorDB) {
-                return AuthorDB[name]
+                return AuthorDB[name];
               }
 
-              throw new Error(`No author named ${name} found in database`)
+              throw new Error(`No author named ${name} found in database`);
             },
             books() {
-              return Object.values(BookDB)
+              return Object.values(BookDB);
             }
           },
 
@@ -320,9 +369,9 @@ mutation {
 
           Mutation: {
             async addAuthor(_, { author }) {
-              await delay(3000)
+              await delay(2500);
 
-              const { name, age } = author
+              const { name, age } = author;
 
               // add author if it doesn't exist in DB
               if (!(name in AuthorDB)) {
@@ -331,90 +380,89 @@ mutation {
                   age,
                   addedAt: new Date().toISOString(),
                   books: []
-                }
+                };
               }
 
-              return AuthorDB[name]
+              return AuthorDB[name];
             },
 
             async addBookForAuthor(
               _,
               { authorName, book: { name: bookName, publisher, publishedYear } }
             ) {
-              await delay(4000)
+              await delay(2500);
 
               if (authorName in AuthorDB) {
-                const author = AuthorDB[authorName]
-                const authorHasBook = !!author.books.filter(book => book.name === bookName).length
+                const author = AuthorDB[authorName];
+                const authorHasBook = !!author.books.filter(book => book.name === bookName).length;
+                const bookIdx = `${bookName}:${publisher}:${publishedYear}`;
+                const book = BookDB[bookIdx];
 
                 if (authorHasBook) {
-                  return author
+                  return book;
                 }
 
-                const bookIdx = `${bookName}:${publisher}:${publishedYear}`
-                const book = BookDB[bookIdx]
-
                 if (book) {
-                  book.authors.push(author)
-                  BookDB[bookIdx] = book
+                  book.authors.push(author);
+                  BookDB[bookIdx] = book;
                 } else {
                   BookDB[bookIdx] = {
                     name: bookName,
                     publisher,
                     publishedYear,
                     authors: [author]
-                  }
+                  };
                 }
 
-                author.books.push(BookDB[bookIdx])
+                author.books.push(BookDB[bookIdx]);
 
-                return BookDB[bookIdx]
+                return BookDB[bookIdx];
               }
 
-              throw new Error(`Author with name ${name} not found`)
+              throw new Error(`Author with name ${name} not found`);
             }
           }
-        }
+        };
 
-        return browserGql.getQueryRunner({ typeDefs, resolvers })
+        return browserGql.getQueryRunner({ typeDefs, resolvers });
       }
 
       function main() {
-        const $form = document.getElementById('input-form')
-        const $input = document.getElementById('query')
-        const $output = document.getElementById('result')
-        const $queries = document.querySelector('.queries')
-        const executeQuery = getQueryRunner()
+        const $form = document.getElementById("input-form");
+        const $input = document.getElementById("query");
+        const $output = document.getElementById("result");
+        const $queries = document.querySelector(".queries");
+        const executeQuery = getQueryRunner();
 
-        $queries.addEventListener('click', e => {
+        $queries.addEventListener("click", e => {
           if (e.target instanceof HTMLPreElement) {
-            $input.value = e.target.innerText
-            $output.value = ''
+            $input.value = e.target.innerText;
+            $output.value = "";
             window.scrollTo({
               top: 0,
               left: 0,
-              behavior: 'smooth'
-            })
+              behavior: "smooth"
+            });
           }
-        })
+        });
 
-        $form.addEventListener('submit', async e => {
-          e.preventDefault()
-          const query = $input.value
-          $output.value = 'Loading...'
+        $form.addEventListener("submit", async e => {
+          e.preventDefault();
+          const query = $input.value;
+          $output.value = "Loading...";
           const interval = setInterval(() => {
-            if ($output.value === 'Loading...') {
-              $output.value = 'Loading'
+            if ($output.value === "Loading...") {
+              $output.value = "Loading";
             } else {
-              $output.value += '.'
+              $output.value += ".";
             }
-          }, 500)
-          const result = await executeQuery(query)
-          clearInterval(interval)
-          $output.value = JSON.stringify(result, null, 2)
-        })
+          }, 500);
+          const result = await executeQuery(query);
+          clearInterval(interval);
+          $output.value = JSON.stringify(result, null, 2);
+        });
       }
-      main()
+      main();
     </script>
   </body>
 </html>
