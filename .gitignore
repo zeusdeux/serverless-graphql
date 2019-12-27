@@ -3,6 +3,8 @@
 !.prettierrc
 !package*
 !rollup.config*
+!.nowignore
+!now.json
 !Readme*
 !demo.gif
 !src
