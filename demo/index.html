@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Browser graphql demo</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+      }
+      main {
+        padding: 2rem 5rem;
+      }
+      h1 {
+        margin-bottom: 2rem;
+      }
+      .editor {
+        height: 88vh;
+        display: flex;
+        flex-direction: row;
+        margin-top: 3rem;
+      }
+      textarea {
+        width: 100%;
+        resize: none;
+      }
+      button {
+        margin: 1rem 0 0;
+        height: 40px;
+        width: 100px;
+      }
+      .input,
+      .output,
+      .schema {
+        width: 100%;
+      }
+      .input,
+      .output {
+        margin-right: 2rem;
+      }
+      .input > form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .input textarea,
+      .output textarea {
+        height: 75%;
+        padding: 1rem;
+      }
+      .queries {
+        width: 100%;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-evenly;
+      }
+      .queries > div {
+        padding: 1rem;
+      }
+      .queries pre {
+        flex-basis: 400px;
+        cursor: pointer;
+        padding: 1rem;
+      }
+      .queries pre:hover {
+        background-color: #efefef;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Try out graphql fully running in the browser</h1>
+      <em
+        >Please note that all query delays are synthetic and emulated to show async/await support in
+        resolvers.</em
+      >
+      <div class="editor">
+        <div class="input">
+          <form id="input-form">
+            <textarea
+              cols="30"
+              id="query"
+              name="query"
+              rows="10"
+              placeholder="Enter gql query here"
+            ></textarea>
+            <button type="submit">Run query</button>
+          </form>
+        </div>
+        <div class="output">
+          <textarea
+            cols="30"
+            id="result"
+            name="result"
+            rows="10"
+            placeholder="Query result will be shown here"
+            readonly
+          ></textarea>
+        </div>
+        <div class="schema">
+          <pre>
+  type Query {
+    authors: [Author]!
+    author(name: String!): Author!
+    books: [Book]!
+  }
+
+  type Author {
+    name: String!
+    age: Int!
+    addedAt: String!
+    books: [Book]!
+  }
+
+  type Book {
+    name: String!
+    publisher: String!
+    publishedYear: Int!
+    authors: [Author!]
+  }
+
+  input AuthorInput {
+    name: String!
+    age: Int!
+  }
+
+  input BookInput {
+    name: String!
+    publisher: String!
+    publishedYear: Int!
+  }
+
+  type Mutation {
+    addAuthor(author: AuthorInput!): Author!
+    addBookForAuthor(authorName: String!, book: BookInput): Book!
+  }
+          </pre>
+        </div>
+      </div>
+      <div class="queries">
+        <div>
+          <h1>Example queries</h1>
+          <em>You can click 'em to paste 'em</em>
+        </div>
+        <pre>
+mutation {
+  addAuthor(author: { name: "Test Author", age: 99 }) {
+    name
+    age
+    books {
+      name
+      publisher
+      publishedYear
+      authors {
+         name
+         age
+         addedAt
+      }
+    }
+    addedAt
+  }
+}
+        </pre>
+        <pre>
+mutation {
+  addBookForAuthor(
+    authorName: "Test Author"
+    book: { name: "Some book lad", publisher: "Penguin", publishedYear: 1999 }
+  ) {
+    name
+    publisher
+    publishedYear
+    authors {
+      name
+      age
+      addedAt
+      books {
+        name
+        publisher
+        publishedYear
+      }
+    }
+  }
+}
+        </pre>
+        <pre>
+{
+  authors {
+    name
+    age
+    books {
+      name
+      publisher
+      publishedYear
+      authors {
+        name
+        age
+        addedAt
+      }
+    }
+    addedAt
+  }
+}
+        </pre>
+        <pre>
+{
+  books {
+    name
+    publisher
+    publishedYear
+    authors {
+       name
+       age
+       addedAt
+    }
+  }
+}
+        </pre>
+        <pre>
+{
+  author(name: "Test Author") {
+    name
+    age
+    books {
+      name
+      publisher
+      publishedYear
+      authors {
+        name
+        age
+        addedAt
+      }
+    }
+    addedAt
+  }
+}
+        </pre>
+      </div>
+    </main>
+    <script type="text/javascript" src="./browser-gql.umd.js"></script>
+    <script type="text/javascript">
+      function getQueryRunner() {
+        const AuthorDB = {}
+        const BookDB = {}
+
+        const gql = String.raw
+
+        const delay = ms => {
+          return new Promise(res => {
+            setTimeout(res, ms)
+          })
+        }
+
+        const typeDefs = gql`
+          type Query {
+            authors: [Author]!
+            author(name: String!): Author!
+            books: [Book]!
+          }
+
+          type Author {
+            name: String!
+            age: Int!
+            addedAt: String!
+            books: [Book]!
+          }
+
+          type Book {
+            name: String!
+            publisher: String!
+            publishedYear: Int!
+            authors: [Author!]
+          }
+
+          input AuthorInput {
+            name: String!
+            age: Int!
+          }
+
+          input BookInput {
+            name: String!
+            publisher: String!
+            publishedYear: Int!
+          }
+
+          type Mutation {
+            addAuthor(author: AuthorInput!): Author!
+            addBookForAuthor(authorName: String!, book: BookInput): Book!
+          }
+        `
+
+        const resolvers = {
+          Query: {
+            authors() {
+              return Object.values(AuthorDB)
+            },
+            async author(_, { name }) {
+              await delay(3000)
+
+              if (name in AuthorDB) {
+                return AuthorDB[name]
+              }
+
+              throw new Error(`No author named ${name} found in database`)
+            },
+            books() {
+              return Object.values(BookDB)
+            }
+          },
+
+          // Author: {}, // not providing this let's us use the default resolvers
+
+          Mutation: {
+            async addAuthor(_, { author }) {
+              await delay(3000)
+
+              const { name, age } = author
+
+              // add author if it doesn't exist in DB
+              if (!(name in AuthorDB)) {
+                AuthorDB[name] = {
+                  name,
+                  age,
+                  addedAt: new Date().toISOString(),
+                  books: []
+                }
+              }
+
+              return AuthorDB[name]
+            },
+
+            async addBookForAuthor(
+              _,
+              { authorName, book: { name: bookName, publisher, publishedYear } }
+            ) {
+              await delay(4000)
+
+              if (authorName in AuthorDB) {
+                const author = AuthorDB[authorName]
+                const authorHasBook = !!author.books.filter(book => book.name === bookName).length
+
+                if (authorHasBook) {
+                  return author
+                }
+
+                const bookIdx = `${bookName}:${publisher}:${publishedYear}`
+                const book = BookDB[bookIdx]
+
+                if (book) {
+                  book.authors.push(author)
+                  BookDB[bookIdx] = book
+                } else {
+                  BookDB[bookIdx] = {
+                    name: bookName,
+                    publisher,
+                    publishedYear,
+                    authors: [author]
+                  }
+                }
+
+                author.books.push(BookDB[bookIdx])
+
+                return BookDB[bookIdx]
+              }
+
+              throw new Error(`Author with name ${name} not found`)
+            }
+          }
+        }
+
+        return browserGql.getQueryRunner({ typeDefs, resolvers })
+      }
+
+      function main() {
+        const $form = document.getElementById('input-form')
+        const $input = document.getElementById('query')
+        const $output = document.getElementById('result')
+        const $queries = document.querySelector('.queries')
+        const executeQuery = getQueryRunner()
+
+        $queries.addEventListener('click', e => {
+          if (e.target instanceof HTMLPreElement) {
+            $input.value = e.target.innerText
+            $output.value = ''
+            window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'smooth'
+            })
+          }
+        })
+
+        $form.addEventListener('submit', async e => {
+          e.preventDefault()
+          const query = $input.value
+          $output.value = 'Loading...'
+          const interval = setInterval(() => {
+            if ($output.value === 'Loading...') {
+              $output.value = 'Loading'
+            } else {
+              $output.value += '.'
+            }
+          }, 500)
+          const result = await executeQuery(query)
+          clearInterval(interval)
+          $output.value = JSON.stringify(result, null, 2)
+        })
+      }
+      main()
+    </script>
+  </body>
+</html>

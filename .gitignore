@@ -7,4 +7,6 @@
 !demo.gif
 !src
 !src/**
+!demo
+!demo/**
 **/.tern*
