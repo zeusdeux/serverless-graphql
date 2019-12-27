@@ -11,7 +11,8 @@
     "bundle": "rollup -c ./rollup.config.js",
     "build": "npm run clean && npm run bundle",
     "prepack": "npm run build",
-    "watch": "rollup -c ./rollup.config.js -w"
+    "watch": "rollup -c ./rollup.config.js -w",
+    "now-build": "npm run build"
   },
   "keywords": [
     "graphql",
@@ -30,5 +31,8 @@
   },
   "dependencies": {
     "graphql": "^14.5.8"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }
