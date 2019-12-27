@@ -41,9 +41,9 @@
         margin-bottom: 2rem;
       }
       .editor {
-        height: 88vh;
+        min-height: 88vh;
         display: flex;
-        flex-direction: row;
+        flex-flow: row wrap;
         margin-top: 3rem;
       }
       textarea {
@@ -66,13 +66,11 @@
         margin-right: 0.5rem;
       }
       .input,
-      .output,
-      .schema {
-        width: 100%;
-      }
-      .input,
       .output {
         margin-right: 2rem;
+        flex-grow: 2;
+        flex-basis: 400px;
+        min-height: 350px;
       }
       .input > form {
         display: flex;
@@ -84,19 +82,27 @@
         height: 75%;
         padding: 1rem;
       }
+      .schema > pre {
+        white-space: pre-wrap;
+      }
+      .schema > h2 {
+        padding-left: 1rem;
+      }
       .queries {
         width: 100%;
         display: flex;
         flex-flow: row wrap;
-        justify-content: space-evenly;
+        justify-content: center;
       }
       .queries > div {
         padding: 1rem;
       }
       .queries pre {
         flex-basis: 400px;
+        min-width: 350px;
         cursor: pointer;
         padding: 1rem;
+        white-space: break-spaces;
       }
       .queries pre:hover {
         background-color: #efefef;
@@ -155,6 +161,7 @@
           ></textarea>
         </div>
         <div class="schema">
+          <h2>Schema</h2>
           <pre>
   type Query {
     authors: [Author]!
@@ -201,7 +208,7 @@
         </div>
         <pre>
 mutation {
-  addAuthor(author: { name: "Test Author", age: 99 }) {
+  newAuthor: addAuthor(author: { name: "Test Author", age: 99 }) {
     name
     age
     books {
