@@ -3,24 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="author" content="Mudit">
-    <meta name="description" content="Running GraphQL in the browser without a server.">
-    <meta name="keywords" content="GraphQL, mudit, browser, serverless">
+    <meta name="description" content="Running GraphQL anywhere without a server.">
+    <meta name="keywords" content="GraphQL, mudit, browser, serverless, without server">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- FB related meta tags -->
-    <meta property="og:title" content="Running GraphQL in the browser without a server."/>
+    <meta property="og:title" content="Running GraphQL anywhere without a server."/>
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://browser-graphql.zdx.cat">
-    <meta property="og:description" content="Running GraphQL in the browser without a server.">
+    <meta property="og:url" content="https://no-server-gql.zdx.cat">
+    <meta property="og:description" content="Running GraphQL anywhere without a server.">
 
     <!-- Twitter related meta tags -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:url" content="https://browser-graphql.zdx.cat">
-    <meta name="twitter:title" content="Running GraphQL in the browser without a server.">
-    <meta name="twitter:description" content="Running GraphQL in the browser without a server.">
+    <meta name="twitter:url" content="https://no-server-gql.zdx.cat">
+    <meta name="twitter:title" content="Running GraphQL anywhere without a server.">
+    <meta name="twitter:description" content="Running GraphQL anywhere without a server.">
     <link href="./favicon.ico" rel="icon" type="image/ico" />
 
-    <title>Browser GraphQL demo</title>
+    <title>GraphQL without a server demo</title>
     <style>
       * {
         box-sizing: border-box;
@@ -105,14 +105,14 @@
   </head>
   <body>
     <main>
-      <h1>Try out graphql running fully in the browser</h1>
+      <h1>Try out graphql running without a server</h1>
       <em
       >Please note that all query delays are synthetic and emulated to show async/await support in
         resolvers.</em
                   >
       <a
         class="github-link"
-        href="https://github.com/zeusdeux/browser-graphql"
+        href="https://github.com/zeusdeux/serverless-graphql
         target="_blank"
         rel="noreferrer nofollow"
       >
@@ -294,7 +294,7 @@ mutation {
         </pre>
       </div>
     </main>
-    <script type="text/javascript" src="./browser-gql.umd.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/@zeusdeux/serverless-graphql"></script>
     <script type="text/javascript">
       function getQueryRunner() {
         const AuthorDB = {};
@@ -424,7 +424,7 @@ mutation {
           }
         };
 
-        return browserGql.getQueryRunner({ typeDefs, resolvers });
+        return serverlessGql.getQueryRunner({ typeDefs, resolvers });
       }
 
       function main() {

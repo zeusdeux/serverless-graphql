@@ -1,22 +1,24 @@
 {
-  "name": "browser-graphql",
+  "name": "@zeusdeux/serverless-graphql",
   "version": "0.0.1",
-  "description": "GraphQL fully in the browser",
-  "main": "dist/browser-gql.umd.js",
-  "module": "dist/browser-gql.esm.js",
+  "description": "Run GraphQL from anywhere without the need for server",
+  "main": "dist/serverless-gql.umd.js",
+  "module": "dist/serverless-gql.esm.js",
   "sideEffects": false,
+  "private": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rimraf dist",
     "bundle": "rollup -c ./rollup.config.js",
     "build": "npm run clean && npm run bundle",
     "prepack": "npm run build",
-    "watch": "rollup -c ./rollup.config.js -w",
-    "now-build": "npm run build"
+    "watch": "rollup -c ./rollup.config.js -w"
   },
   "keywords": [
     "graphql",
-    "browser"
+    "browser",
+    "serverless",
+    "no server"
   ],
   "author": "Mudit Ameta <zeusdeux@gmail.com>",
   "license": "ISC",

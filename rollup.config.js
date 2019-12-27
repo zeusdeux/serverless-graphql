@@ -8,13 +8,13 @@ export default [
     input: './src/index.js',
     output: [
       {
-        file: 'dist/browser-gql.umd.js',
+        file: 'dist/serverless-gql.umd.js',
         format: 'umd',
-        name: 'browserGql',
+        name: 'serverlessGql',
         sourcemap: true
       },
       {
-        file: 'dist/browser-gql.esm.js',
+        file: 'dist/serverless-gql.esm.js',
         format: 'esm',
         sourcemap: true
       }

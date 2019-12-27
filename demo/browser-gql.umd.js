@@ -1,1 +1,0 @@
-../dist/browser-gql.umd.js

@@ -2,12 +2,9 @@
   "name": "browser-graphql",
   "version": 2,
   "scope": "zdx",
-  "alias": ["browser-graphql.zdx.cat"],
+  "alias": ["no-server-gql.zdx.cat"],
   "public": true,
-  "builds": [
-    { "src": "package.json", "use": "@now/static-build" },
-    { "src": "demo/*", "use": "@now/static" }
-  ],
+  "builds": [{ "src": "demo/*", "use": "@now/static" }],
   "routes": [
     { "src": "/", "methods": ["GET"], "dest": "/demo/index.html" },
     { "src": "/(.*)", "methods": ["GET"], "dest": "/demo/$1" }
