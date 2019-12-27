@@ -1,0 +1,8 @@
+*
+!.gitignore
+!.prettierrc
+!package*
+!rollup.config*
+!demo.gif
+!src
+!src/**
