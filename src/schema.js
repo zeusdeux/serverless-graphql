@@ -1,17 +1,25 @@
 import { buildSchema } from 'graphql/utilities'
 
-export function makeExecutableSchema({ typeDefs, resolvers }) {
-  const schemaWithoutResolvers = buildSchema(typeDefs)
-  const queryResolvers = Object.keys(resolvers.Query)
-  const mutationResolvers = Object.keys(resolvers.Mutation)
+// From https://graphql.org/learn/schema/#scalar-types
+const BUILT_IN_SCALARS = ['Int', 'Float', 'String', 'Boolean', 'ID']
 
-  queryResolvers.forEach(field => {
-    schemaWithoutResolvers._queryType._fields[field].resolve = resolvers.Query[field]
+export function makeExecutableSchema({ typeDefs, resolvers: typeToFieldResolversMap }) {
+  const schema = buildSchema(typeDefs) // the returned schema has only default resolvers
+  const typesInSchema = Object.keys(schema.getTypeMap()).filter(
+    k => !k.startsWith('__') && !BUILT_IN_SCALARS.includes(k)
+  )
+
+  // overwrite default resolvers with ours where provided
+  typesInSchema.forEach(type => {
+    const fieldResolversForType = typeToFieldResolversMap[type]
+
+    Object.keys(schema._typeMap[type]._fields).forEach(field => {
+      schema._typeMap[type]._fields[field].resolve =
+        fieldResolversForType && fieldResolversForType[field]
+
+      // if resolve is set to undefined, then graphql uses default resolvers so we're good
+    })
   })
 
-  mutationResolvers.forEach(mutation => {
-    schemaWithoutResolvers._mutationType._fields[mutation].resolve = resolvers.Mutation[mutation]
-  })
-
-  return schemaWithoutResolvers
+  return schema
 }
