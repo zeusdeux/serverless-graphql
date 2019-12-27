@@ -1,7 +1,7 @@
 {
-  "name": "client-side-graphql",
-  "version": "1.0.0",
-  "description": "GraphQL for the browser",
+  "name": "browser-graphql",
+  "version": "0.0.1",
+  "description": "GraphQL fully in the browser",
   "main": "dist/browser-gql.umd.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
