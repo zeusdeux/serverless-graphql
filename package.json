@@ -40,5 +40,13 @@
   },
   "engines": {
     "node": "12.x"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeusdeux/serverless-graphql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zeusdeux/serverless-graphql/issues"
+  },
+  "homepage": "https://github.com/zeusdeux/serverless-graphql#readme"
 }
