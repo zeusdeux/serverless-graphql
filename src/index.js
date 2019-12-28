@@ -7,4 +7,6 @@ export function getQueryRunner(...args) {
   return query => graphql(schema, query)
 }
 
+export const gql = String.raw
+
 export { makeExecutableSchema }
