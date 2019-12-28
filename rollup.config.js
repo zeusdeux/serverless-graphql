@@ -12,7 +12,7 @@ export default [
     input: './src/index.js',
     output: [
       {
-        file: 'umd/serverless-gql.umd.js',
+        file: 'dist/serverless-gql.umd.js',
         format: 'umd',
         name: 'serverlessGql',
         sourcemap: true
@@ -49,7 +49,6 @@ export default [
         format: 'esm',
         sourcemap: true
       }
-    ],
-    plugins: [replace({ 'process.env.NODE_ENV': '"production"' })]
+    ]
   }
 ]
