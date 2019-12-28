@@ -206,6 +206,10 @@ const runQuery = getQueryRunner({ typeDefs, resolvers })
 runQuery('{ hello }').then(({ data }) => console.log(data)) // logs {hello: "world!"}
 ```
 
+### `gql`
+
+An alias for `String.raw`. This lets `prettier` format the type definitions for you automatically.
+
 ## Packages published
 
 This repo publishes a umd package with its external dependencies, `graphql` and `graphql/utilities`,
