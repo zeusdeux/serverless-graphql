@@ -4,6 +4,208 @@ Run GraphQL on any schema directly from anywhere without the need for a graphql 
 
 This is _super_ experimental and just fun mostly.
 
+## Installation
+
+```js
+npm install @zeusdeux/serverless-graphql
+```
+
+> You can use other package managers as well.
+
+## API
+
+### `makeExecutableSchema`
+
+This function accepts an `options` object with two properties for now.
+
+e.g.,
+
+```js
+import { makeExecutableSchema } from '@zeusdeux/serverless-graphql'
+
+const typeDefs = gql`
+  type Query {
+    hello: String!
+  }
+`
+
+const resolvers = {
+  Query: {
+    hello: () => 'world!'
+  }
+}
+
+const schema = makeExecutableSchema({ typeDefs, resolvers })
+
+// this schema can then be consumed by other packages such as apollo-server, etc to run a dev server for example.
+```
+
+#### `options.typeDefs`
+
+These are the type definitions of your GraphQL server.
+
+e.g.,
+
+```gql
+type Query {
+  authors: [Author]!
+  author(name: String!): Author!
+  books: [Book]!
+}
+
+type Author {
+  name: String!
+  age: Int!
+  addedAt: String!
+  books: [Book]!
+}
+
+type Book {
+  name: String!
+  publisher: String!
+  publishedYear: Int!
+  authors: [Author!]
+}
+
+input AuthorInput {
+  name: String!
+  age: Int!
+}
+
+input BookInput {
+  name: String!
+  publisher: String!
+  publishedYear: Int!
+}
+
+type Mutation {
+  addAuthor(author: AuthorInput!): Author!
+  addBookForAuthor(authorName: String!, book: BookInput): Book!
+}
+```
+
+#### `options.resolvers`
+
+This an object contain the resolvers for the types provided in the `typeDefs`. If any resolver is
+missing, the default resolver is used. The default resolver comes from `graphql` package, which is
+basically an identity function per field in a type.
+
+The resolver function can also be `async` and use the `async/await` syntax.
+
+If a resolver throws an error, the query execution is stopped and the error is returned to the user
+in the `errors` key of the reponse.
+
+A working example matching the schema above is provided below.
+
+```js
+const AuthorDB = {}
+const BookDB = {}
+
+const delay = ms => {
+  return new Promise(res => {
+    setTimeout(res, ms)
+  })
+}
+
+const resolvers = {
+  Query: {
+    authors() {
+      return Object.values(AuthorDB)
+    },
+    author(_, { name }) {
+      if (name in AuthorDB) {
+        return AuthorDB[name]
+      }
+
+      throw new Error(`No author named ${name} found in database`)
+    },
+    books() {
+      return Object.values(BookDB)
+    }
+  },
+
+  // Author: {}, // not providing this let's us use the default resolvers
+
+  Mutation: {
+    addAuthor(_, { author }) {
+      const { name, age } = author
+
+      // add author if it doesn't exist in DB
+      if (!(name in AuthorDB)) {
+        AuthorDB[name] = {
+          name,
+          age,
+          addedAt: new Date().toISOString(),
+          books: []
+        }
+      }
+
+      return AuthorDB[name]
+    },
+
+    async addBookForAuthor(_, { authorName, book: { name: bookName, publisher, publishedYear } }) {
+      await delay(2500)
+
+      if (authorName in AuthorDB) {
+        const author = AuthorDB[authorName]
+        const authorHasBook = !!author.books.filter(book => book.name === bookName).length
+        const bookIdx = `${bookName}:${publisher}:${publishedYear}`
+        const book = BookDB[bookIdx]
+
+        if (authorHasBook) {
+          return book
+        }
+
+        if (book) {
+          book.authors.push(author)
+          BookDB[bookIdx] = book
+        } else {
+          BookDB[bookIdx] = {
+            name: bookName,
+            publisher,
+            publishedYear,
+            authors: [author]
+          }
+        }
+
+        author.books.push(BookDB[bookIdx])
+
+        return BookDB[bookIdx]
+      }
+
+      throw new Error(`Author with name ${name} not found`)
+    }
+  }
+}
+```
+
+### `getQueryRunner`
+
+This function accepts the same options as `makeExecutableSchema` and returns a function which
+accepts a GraphQL query to execute on the provided schema (typedefs + resolvers).
+
+e.g.,
+
+```js
+import { getQueryRunner, gql } from '@zeusdeux/serverless-graphql'
+
+const typeDefs = gql`
+  type Query {
+    hello: String!
+  }
+`
+
+const resolvers = {
+  Query: {
+    hello: () => 'world!'
+  }
+}
+
+const runQuery = getQueryRunner({ typeDefs, resolvers })
+
+runQuery('{ hello }').then(({ data }) => console.log(data)) // logs {hello: "world!"}
+```
+
 ## Packages published
 
 This repo publishes a umd package with its external dependencies, `graphql` and `graphql/utilities`,
