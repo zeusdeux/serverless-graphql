@@ -21,7 +21,7 @@ export interface QueryRunnerOptions {
   operationToRun?: string
 }
 
-export type QueryRunnerFunction = (request: string | QueryRunnerOptions) => Promise<any>
+export type QueryRunnerFunction<T = any> = (request: string | QueryRunnerOptions) => Promise<T>
 
 export function getQueryRunner(opts: MakeExecutableSchemaOptions): QueryRunnerFunction
 export function makeExecutableSchema(opts: MakeExecutableSchemaOptions): GraphQLSchema
