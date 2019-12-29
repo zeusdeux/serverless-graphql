@@ -40,20 +40,14 @@
       h1 {
         margin-bottom: 2rem;
       }
-      .editor {
-        min-height: 88vh;
-        display: flex;
-        flex-flow: row wrap;
-        margin-top: 3rem;
-      }
       textarea {
         width: 100%;
         resize: none;
+        padding: 1rem;
       }
       button {
         margin: 1rem 0 0;
         height: 40px;
-        width: 100px;
         cursor: pointer;
       }
       .github-link {
@@ -65,28 +59,45 @@
       .github-link > p {
         margin-right: 0.5rem;
       }
+      .editor {
+        min-height: 55vh;
+        display: flex;
+        flex-flow: row wrap;
+        margin: 3rem 0;
+      }
       .input,
       .output {
         margin-right: 2rem;
         flex-grow: 2;
         flex-basis: 400px;
         min-height: 350px;
+        margin-bottom: 1rem;
       }
       .input > form {
         display: flex;
         flex-direction: column;
         height: 100%;
       }
-      .input textarea,
+      .input textarea {
+        height: 100%;
+      }
+      .input textarea:last-of-type {
+        margin-top: 1rem;
+        flex-shrink: 2;
+      }
+      .output {
+        display: flex;
+        flex-direction: column;
+      }
       .output textarea {
-        height: 75%;
-        padding: 1rem;
+        flex-basis: 100%;
       }
       .schema > pre {
         white-space: pre-wrap;
       }
       .schema > h2 {
         padding-left: 1rem;
+        margin-top: 0rem;
       }
       .queries {
         width: 100%;
@@ -98,7 +109,6 @@
         padding: 1rem;
       }
       .queries pre {
-        flex-basis: 400px;
         min-width: 350px;
         cursor: pointer;
         padding: 1rem;
@@ -112,16 +122,15 @@
   <body>
     <main>
       <h1>Try out graphql running without a server</h1>
-      <em
-      >Please note that all query delays are synthetic and emulated to show async/await support in
-        resolvers.</em
-                  >
+      <em>
+        Please note that all query delays are synthetic and emulated to show async/await support in
+        resolvers.
+      </em>
       <a
         class="github-link"
         href="https://github.com/zeusdeux/serverless-graphql"
         target="_blank"
-        rel="noreferrer nofollow"
-      >
+        rel="noreferrer nofollow">
         <p>View source on</p>
         <svg
           class="github-mark"
@@ -142,10 +151,17 @@
           <form id="input-form">
             <textarea
               cols="30"
-              id="query"
-              name="query"
+              id="request"
+              name="request"
               rows="10"
               placeholder="Enter gql query here"
+            ></textarea>
+            <textarea
+              cols="30"
+              id="variables"
+              name="variables"
+              rows="10"
+              placeholder="Enter your variables as JSON here"
             ></textarea>
             <button type="submit">Run query</button>
           </form>
@@ -244,6 +260,59 @@ mutation {
         publishedYear
       }
     }
+  }
+}
+        </pre>
+        <pre data-jsonpayload='{"req":"\n    mutation addAuthor($author: AuthorInput!) {\n      newAuthor: addAuthor(author: $author) {\n        name\n        age\n        books {\n          name\n          publisher\n          publishedYear\n          authors {\n            name\n            age\n            addedAt\n          }\n        }\n        addedAt\n      }\n    }\n  ","variables":{"author":{"name":"Another Author","age":21}}}'>
+{
+  req: gql`
+    mutation addAuthor($author: AuthorInput!) {
+      newAuthor: addAuthor(author: $author) {
+        name
+        age
+        books {
+          name
+          publisher
+          publishedYear
+          authors {
+            name
+            age
+            addedAt
+          }
+        }
+        addedAt
+      }
+    }
+  `,
+  variables: {
+    author: { name: 'Another Author', age: 21 }
+  }
+}
+        </pre>
+        <pre data-jsonpayload='{"req":"\n    mutation addBook($authorName: String!, $book: BookInput!) {\n      addBookForAuthor(authorName: $authorName, book: $book) {\n        name\n        publisher\n        publishedYear\n        authors {\n          name\n          age\n          addedAt\n          books {\n            name\n            publisher\n            publishedYear\n          }\n        }\n      }\n    }\n  ","variables":{"authorName":"Test Author","book":{"name":"Some book lad","publisher":"Penguin","publishedYear":1999}}}'>
+{
+  req: gql`
+    mutation addBook($authorName: String!, $book: BookInput!) {
+      addBookForAuthor(authorName: $authorName, book: $book) {
+        name
+        publisher
+        publishedYear
+        authors {
+          name
+          age
+          addedAt
+          books {
+            name
+            publisher
+            publishedYear
+          }
+        }
+      }
+    }
+  `,
+  variables: {
+    author: 'Test Author',
+    book: { name: 'Some book lad', publisher: 'Penguin', publishedYear: 1999 }
   }
 }
         </pre>
@@ -436,15 +505,20 @@ mutation {
 
       function main() {
         const $form = document.getElementById("input-form");
-        const $input = document.getElementById("query");
+        const $input = document.getElementById("request");
+        const $variables = document.getElementById("variables");
         const $output = document.getElementById("result");
         const $queries = document.querySelector(".queries");
         const executeQuery = getQueryRunner();
 
         $queries.addEventListener("click", e => {
           if (e.target instanceof HTMLPreElement) {
-            $input.value = e.target.innerText;
+            const parsedRequest = JSON.parse(e.target.dataset.jsonpayload || `{ "req": ${JSON.stringify(e.target.innerText)}}`)
+
+            $input.value = parsedRequest.req
+            $variables.value = JSON.stringify(parsedRequest.variables, null, 2) || ''
             $output.value = "";
+
             window.scrollTo({
               top: 0,
               left: 0,
@@ -455,18 +529,26 @@ mutation {
 
         $form.addEventListener("submit", async e => {
           e.preventDefault();
-          const query = $input.value;
-          $output.value = "Loading...";
-          const interval = setInterval(() => {
-            if ($output.value === "Loading...") {
-              $output.value = "Loading";
-            } else {
-              $output.value += ".";
-            }
-          }, 500);
-          const result = await executeQuery(query);
-          clearInterval(interval);
-          $output.value = JSON.stringify(result, null, 2);
+
+          try {
+            const query = $input.value;
+            const variables = $variables.value.length ? JSON.parse($variables.value) : null
+
+            $output.value = "Loading...";
+
+            const interval = setInterval(() => {
+              if ($output.value === "Loading...") {
+                $output.value = "Loading";
+              } else {
+                $output.value += ".";
+              }
+            }, 500);
+            const result = await executeQuery({ req: query, variables });
+            clearInterval(interval);
+            $output.value = JSON.stringify(result, null, 2);
+          } catch(e) {
+            alert(e.message)
+          }
         });
       }
       main();
