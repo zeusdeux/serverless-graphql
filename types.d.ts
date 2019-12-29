@@ -1,4 +1,4 @@
-import { GraphQLSchema } from 'graphql'
+import { GraphQLSchema, ExecutionResult } from 'graphql'
 
 export type ResolverFunction = (...args: any[]) => any
 
@@ -21,7 +21,9 @@ export interface QueryRunnerOptions {
   operationToRun?: string
 }
 
-export type QueryRunnerFunction<T = any> = (request: string | QueryRunnerOptions) => Promise<T>
+export type QueryRunnerFunction<T = any> = (
+  request: string | QueryRunnerOptions
+) => Promise<ExecutionResult<T>>
 
 export function getQueryRunner(opts: MakeExecutableSchemaOptions): QueryRunnerFunction
 export function makeExecutableSchema(opts: MakeExecutableSchemaOptions): GraphQLSchema
