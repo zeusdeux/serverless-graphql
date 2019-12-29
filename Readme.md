@@ -206,6 +206,52 @@ const runQuery = getQueryRunner({ typeDefs, resolvers })
 runQuery('{ hello }').then(({ data }) => console.log(data)) // logs {hello: "world!"}
 ```
 
+The function returned by `getQueryRunner` can be provided with the operation as a string as shown in
+the example above. But not only that, it also supports `variables`, `context` which is passed to all
+resolvers, `root` value which gets passed as the root value to the executor and `operationToRun`
+which can be used to selection which operation to run if many are provided in the request string.
+
+#### Another example usage of return value of `getQueryRunner`
+
+```js
+import { getQueryRunner, gql } from '@zeusdeux/serverless-graphql'
+
+const typeDefs = gql`
+  type Query {
+    hello: String!
+  }
+
+  type Mutation {
+    getTime(iso: Boolean = false): String
+  }
+`
+
+const resolvers = {
+  Query: {
+    hello: () => 'world!'
+  },
+  Mutation: {
+    getTime(_, { iso }) {
+      const t = new Date()
+      return iso ? t.toISOString() : t.getTime()
+    }
+  }
+}
+
+const runQuery = s.getQueryRunner({ typeDefs, resolvers })
+
+runQuery({
+  req: gql`
+    mutation whatTimeIsIt($iso: Boolean) {
+      currentServerTime: getTime(iso: $iso)
+    }
+  `,
+  variables: {
+    iso: true
+  }
+}).then(({ data }) => console.log(data)) // logs server time in ISO format
+```
+
 ### `gql`
 
 An alias for `String.raw`. This lets `prettier` format the type definitions for you automatically.
