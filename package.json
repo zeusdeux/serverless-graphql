@@ -14,7 +14,7 @@
     "check-peers": "[[ -d node_modules/graphql ]] && echo 'peerDeps found!' || { echo '---- Maybe install the peerDeps as they are needed by the UMD build? ----'; echo; exit 1; }",
     "build": "npm run check-peers && npm run clean && npm run bundle",
     "prepack": "npm run build",
-    "watch": "rollup -c ./rollup.config.js -w",
+    "watch": "npm run check-peers && rollup -c ./rollup.config.js -w",
     "publish-package": "npm run build && np --no-cleanup --no-tests"
   },
   "keywords": [
