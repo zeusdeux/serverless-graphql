@@ -5,6 +5,7 @@
   "main": "dist/serverless-gql.cjs.js",
   "module": "dist/serverless-gql.esm.js",
   "unpkg": "dist/serverless-gql.umd.js",
+  "types": "types.d.ts",
   "sideEffects": false,
   "private": false,
   "scripts": {

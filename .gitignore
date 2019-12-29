@@ -6,6 +6,7 @@
 !.nowignore
 !now.json
 !Readme*
+!types.d.ts
 !demo.gif
 !src
 !src/**
