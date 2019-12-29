@@ -1,6 +1,6 @@
 {
   "name": "@zeusdeux/serverless-graphql",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Run GraphQL from anywhere without the need for server",
   "main": "dist/serverless-gql.cjs.js",
   "module": "dist/serverless-gql.esm.js",
