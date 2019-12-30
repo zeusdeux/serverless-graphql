@@ -523,7 +523,7 @@ subscription numbers($from: Int, $to: Int) {
         async function* generateNumbers(from = 0, to = 10) {
           let x = from
 
-          while (x < to) {
+          while (x < to + 1) {
             yield {
               numbers: x++
             }
@@ -583,7 +583,9 @@ subscription numbers($from: Int, $to: Int) {
               const timeFmtr = new Intl.RelativeTimeFormat('en', { style: 'narrow' });
               for await (const res of result) {
                 const tNow = Math.floor(Date.now() / 1000)
-                $output.value += JSON.stringify(res, null, 2) + '\n' + `---- ${timeFmtr.format(tStart - tNow, 'second')} ----` + '\n';
+
+                $output.value += JSON.stringify(res, null, 2)
+                $output.value += '\n' + `---- ${timeFmtr.format(tStart - tNow, 'second')} ----` + '\n';
               }
             } else {
               $output.value = JSON.stringify(result, null, 2);
