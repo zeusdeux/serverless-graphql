@@ -14,9 +14,15 @@ export function makeExecutableSchema({ typeDefs, resolvers: typeToFieldResolvers
     const fieldResolversForType = typeToFieldResolversMap[type]
 
     Object.keys(schema._typeMap[type]._fields).forEach(field => {
-      schema._typeMap[type]._fields[field].resolve =
-        fieldResolversForType && fieldResolversForType[field]
-
+      if (type === 'Subscription') {
+        schema._typeMap[type]._fields[field].subscribe =
+          fieldResolversForType && fieldResolversForType[field].subscribe
+        schema._typeMap[type]._fields[field].resolve =
+          fieldResolversForType && fieldResolversForType[field].resolve
+      } else {
+        schema._typeMap[type]._fields[field].resolve =
+          fieldResolversForType && fieldResolversForType[field]
+      }
       // if resolve is set to undefined, then graphql uses default resolvers so we're good
     })
   })

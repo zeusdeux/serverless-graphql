@@ -1,4 +1,4 @@
-import { GraphQLSchema, ExecutionResult } from 'graphql'
+import { GraphQLSchema, ExecutionResult, subscribe } from 'graphql'
 
 export type ResolverFunction = (...args: any[]) => any
 
@@ -23,8 +23,10 @@ export interface QueryRunnerOptions {
 
 export type QueryRunnerFunction<T = { [key: string]: any }> = (
   request: string | QueryRunnerOptions
-) => Promise<ExecutionResult<T>>
+) => Promise<AsyncIterable<ExecutionResult<T>> | ExecutionResult<T>>
 
-export function getQueryRunner<T>(opts: MakeExecutableSchemaOptions): QueryRunnerFunction<T>
+export function getQueryRunner<T>(
+  opts: MakeExecutableSchemaOptions | { schema: GraphQLSchema }
+): QueryRunnerFunction<T>
 export function makeExecutableSchema(opts: MakeExecutableSchemaOptions): GraphQLSchema
 export const gql: typeof String.raw
