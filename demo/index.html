@@ -223,6 +223,11 @@
           <em>You can click 'em to paste 'em</em>
         </div>
         <pre>
+subscription {
+  numbers
+}
+        </pre>
+        <pre>
 mutation {
   newAuthor: addAuthor(author: { name: "Test Author", age: 99 }) {
     name
@@ -261,6 +266,11 @@ mutation {
       }
     }
   }
+}
+        </pre>
+        <pre data-jsonpayload='{"req":"\n    subscription numbers($from: Int, $to: Int) {\n      numbers(from: $from, to: $to)\n    }\n  ","variables":{"from":10,"to":20}}'>
+subscription numbers($from: Int, $to: Int) {
+  numbers(from: $from, to: $to)
 }
         </pre>
         <pre data-jsonpayload='{"req":"\n    mutation addAuthor($author: AuthorInput!) {\n      newAuthor: addAuthor(author: $author) {\n        name\n        age\n        books {\n          name\n          publisher\n          publishedYear\n          authors {\n            name\n            age\n            addedAt\n          }\n        }\n        addedAt\n      }\n    }\n  ","variables":{"author":{"name":"Another Author","age":21}}}'>
@@ -420,6 +430,10 @@ mutation {
             addAuthor(author: AuthorInput!): Author!
             addBookForAuthor(authorName: String!, book: BookInput): Book!
           }
+
+          type Subscription {
+            numbers(from: Int, to: Int): Int!
+          }
         `;
 
         const resolvers = {
@@ -497,8 +511,25 @@ mutation {
 
               throw new Error(`Author with name ${name} not found`);
             }
+          },
+
+          Subscription: {
+            numbers: {
+              subscribe: (_, { from, to }) => generateNumbers(from, to)
+            }
           }
         };
+
+        async function* generateNumbers(from = 0, to = 10) {
+          let x = from
+
+          while (x < to) {
+            yield {
+              numbers: x++
+            }
+            await delay(1000)
+          }
+        }
 
         return serverlessGql.getQueryRunner({ typeDefs, resolvers });
       }
@@ -544,8 +575,19 @@ mutation {
               }
             }, 500);
             const result = await executeQuery({ req: query, variables });
+
             clearInterval(interval);
-            $output.value = JSON.stringify(result, null, 2);
+
+            if (typeof result[Symbol.asyncIterator] === 'function') {
+              const tStart = Math.floor(Date.now() / 1000)
+              const timeFmtr = new Intl.RelativeTimeFormat('en', { style: 'narrow' });
+              for await (const res of result) {
+                const tNow = Math.floor(Date.now() / 1000)
+                $output.value += JSON.stringify(res, null, 2) + '\n' + `---- ${timeFmtr.format(tStart - tNow, 'second')} ----` + '\n';
+              }
+            } else {
+              $output.value = JSON.stringify(result, null, 2);
+            }
           } catch(e) {
             alert(e.message)
           }
