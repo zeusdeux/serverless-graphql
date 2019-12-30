@@ -2,6 +2,7 @@ import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
 import { terser } from 'rollup-plugin-terser'
+import analyze from 'rollup-plugin-analyzer'
 
 export default [
   // for unpkg with the all the dependencies rolled up Due to this
@@ -27,7 +28,13 @@ export default [
     // graphql throws some weird errors as it detects two, potentially
     // different version of graphql might be available thus causing
     // weird behaviours during runtime and hence it throws.
-    plugins: [replace({ 'process.env.NODE_ENV': '"production"' }), resolve(), commonjs(), terser()]
+    plugins: [
+      replace({ 'process.env.NODE_ENV': '"production"' }),
+      resolve(),
+      commonjs(),
+      terser(),
+      process.env.NODE_ENV !== 'production' && analyze({ summaryOnly: true })
+    ]
   },
   {
     // these bundle do NOT bundle up graphql and
@@ -37,7 +44,7 @@ export default [
     // the same reason, it doesn't minify these bundles as the
     // application bundler will do so during consumption.
     input: './src/index.js',
-    external: ['graphql', 'graphql/utilities'],
+    external: ['graphql', 'graphql/utilities', 'graphql/language'],
     output: [
       {
         file: 'dist/serverless-gql.cjs.js',
@@ -49,6 +56,7 @@ export default [
         format: 'esm',
         sourcemap: true
       }
-    ]
+    ],
+    plugins: [process.env.NODE_ENV !== 'production' && analyze()]
   }
 ]
