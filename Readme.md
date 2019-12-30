@@ -2,6 +2,8 @@
 
 Run GraphQL on any schema directly from anywhere without the need for a graphql server.
 
+Supports `Query`, `Mutation` _and_ `Subscription` types.
+
 This is _super_ experimental and just fun mostly.
 
 ## Installation
@@ -184,10 +186,13 @@ const resolvers = {
 This function accepts the same options as `makeExecutableSchema` and returns a function which
 accepts a GraphQL query to execute on the provided schema (typedefs + resolvers).
 
+In lieu of and object containing `{ typeDefs, resolvers }`, this function also accepts an object
+containing a `GraphQLSchema` i.e., `{ schema: GraphQLSchema }`.
+
 e.g.,
 
 ```js
-import { getQueryRunner, gql } from '@zeusdeux/serverless-graphql'
+import { makeExecutableSchema, getQueryRunner, gql } from '@zeusdeux/serverless-graphql'
 
 const typeDefs = gql`
   type Query {
@@ -204,6 +209,13 @@ const resolvers = {
 const runQuery = getQueryRunner({ typeDefs, resolvers })
 
 runQuery('{ hello }').then(({ data }) => console.log(data)) // logs {hello: "world!"}
+
+// or
+
+const schema = makeExecutableSchema({ typeDefs, resolvers })
+const runQuery = getQueryRunner({ schema })
+
+runQuery('{ hello }').then(({ data }) => console.log(data)) // logs {hello: "world!"}
 ```
 
 The function returned by `getQueryRunner` can be provided with the operation as a string as shown in
@@ -211,7 +223,7 @@ the example above. But not only that, it also supports `variables`, `context` wh
 resolvers, `root` value which gets passed as the root value to the executor and `operationToRun`
 which can be used to selection which operation to run if many are provided in the request string.
 
-#### Another example usage of return value of `getQueryRunner`
+#### Using variables with the query runner
 
 ```js
 import { getQueryRunner, gql } from '@zeusdeux/serverless-graphql'
@@ -238,7 +250,7 @@ const resolvers = {
   }
 }
 
-const runQuery = s.getQueryRunner({ typeDefs, resolvers })
+const runQuery = getQueryRunner({ typeDefs, resolvers })
 
 runQuery({
   req: gql`
@@ -250,6 +262,64 @@ runQuery({
     iso: true
   }
 }).then(({ data }) => console.log(data)) // logs server time in ISO format
+```
+
+When a `subscription` is requested using the function returned by `getQueryRunner`, the request
+result is an async iterable which can be use with a
+[for-await...of](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of#Iterating_over_async_iterables)
+loop.
+
+#### `subscription` request example
+
+```js
+import { getQueryRunner, gql } from '@zeusdeux/serverless-graphql'
+
+const delay = ms => {
+  return new Promise(res => {
+    setTimeout(res, ms)
+  })
+}
+
+const typeDefs = gql`
+  type Subscription {
+    getNumber: Int!
+  }
+`
+
+const resolvers = {
+  Subscription: {
+    getNumber: {
+      subscribe: () => generateNumbers()
+    }
+  }
+}
+
+async function* generateNumbers() {
+  let x = 1
+  while (x < 5) {
+    // synthetic delay
+    await delay(1000)
+
+    // whatever is yielded is passed as the root value
+    // to the resolve function next to the subscribe.
+    // In this example, there isn't one which means
+    // GraphQL uses the default resolver which in
+    // this case is resolve(root) = root.getNumber
+    yield {
+      getNumber: x++
+    }
+  }
+}
+
+async function main() {
+  const q = getQueryRunner({ typeDefs, resolvers })
+
+  for await (let x of await q('subscription { getNumber }')) {
+    console.log('Number:', x) // prints Number: 1, Number: 2, and so on
+  }
+}
+
+main().catch(err => console.log.bind('😱', err))
 ```
 
 ### `gql`
