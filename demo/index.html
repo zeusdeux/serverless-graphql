@@ -2,22 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="author" content="Mudit">
-    <meta name="description" content="Running GraphQL anywhere without a server.">
-    <meta name="keywords" content="GraphQL, mudit, browser, serverless, without server">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Mudit" />
+    <meta name="description" content="Running GraphQL anywhere without a server." />
+    <meta name="keywords" content="GraphQL, mudit, browser, serverless, without server" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- FB related meta tags -->
-    <meta property="og:title" content="Running GraphQL anywhere without a server."/>
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://no-server-gql.zdx.cat">
-    <meta property="og:description" content="Running GraphQL anywhere without a server.">
+    <meta property="og:title" content="Running GraphQL anywhere without a server." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://no-server-gql.zdx.cat" />
+    <meta property="og:description" content="Running GraphQL anywhere without a server." />
 
     <!-- Twitter related meta tags -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:url" content="https://no-server-gql.zdx.cat">
-    <meta name="twitter:title" content="Running GraphQL anywhere without a server.">
-    <meta name="twitter:description" content="Running GraphQL anywhere without a server.">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:url" content="https://no-server-gql.zdx.cat" />
+    <meta name="twitter:title" content="Running GraphQL anywhere without a server." />
+    <meta name="twitter:description" content="Running GraphQL anywhere without a server." />
     <link href="./favicon.ico" rel="icon" type="image/ico" />
 
     <title>GraphQL without a server demo</title>
@@ -31,8 +31,8 @@
         padding: 0;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
-        sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
       }
       main {
         padding: 2rem 5rem;
@@ -130,7 +130,8 @@
         class="github-link"
         href="https://github.com/zeusdeux/serverless-graphql"
         target="_blank"
-        rel="noreferrer nofollow">
+        rel="noreferrer nofollow"
+      >
         <p>View source on</p>
         <svg
           class="github-mark"
@@ -268,12 +269,16 @@ mutation {
   }
 }
         </pre>
-        <pre data-jsonpayload='{"req":"\n    subscription numbers($from: Int, $to: Int) {\n      numbers(from: $from, to: $to)\n    }\n  ","variables":{"from":10,"to":20}}'>
+        <pre
+          data-jsonpayload='{"req":"\n    subscription numbers($from: Int, $to: Int) {\n      numbers(from: $from, to: $to)\n    }\n  ","variables":{"from":10,"to":20}}'
+        >
 subscription numbers($from: Int, $to: Int) {
   numbers(from: $from, to: $to)
 }
         </pre>
-        <pre data-jsonpayload='{"req":"\n    mutation addAuthor($author: AuthorInput!) {\n      newAuthor: addAuthor(author: $author) {\n        name\n        age\n        books {\n          name\n          publisher\n          publishedYear\n          authors {\n            name\n            age\n            addedAt\n          }\n        }\n        addedAt\n      }\n    }\n  ","variables":{"author":{"name":"Another Author","age":21}}}'>
+        <pre
+          data-jsonpayload='{"req":"\n    mutation addAuthor($author: AuthorInput!) {\n      newAuthor: addAuthor(author: $author) {\n        name\n        age\n        books {\n          name\n          publisher\n          publishedYear\n          authors {\n            name\n            age\n            addedAt\n          }\n        }\n        addedAt\n      }\n    }\n  ","variables":{"author":{"name":"Another Author","age":21}}}'
+        >
 {
   req: gql`
     mutation addAuthor($author: AuthorInput!) {
@@ -299,7 +304,9 @@ subscription numbers($from: Int, $to: Int) {
   }
 }
         </pre>
-        <pre data-jsonpayload='{"req":"\n    mutation addBook($authorName: String!, $book: BookInput!) {\n      addBookForAuthor(authorName: $authorName, book: $book) {\n        name\n        publisher\n        publishedYear\n        authors {\n          name\n          age\n          addedAt\n          books {\n            name\n            publisher\n            publishedYear\n          }\n        }\n      }\n    }\n  ","variables":{"authorName":"Test Author","book":{"name":"Some book lad","publisher":"Penguin","publishedYear":1999}}}'>
+        <pre
+          data-jsonpayload='{"req":"\n    mutation addBook($authorName: String!, $book: BookInput!) {\n      addBookForAuthor(authorName: $authorName, book: $book) {\n        name\n        publisher\n        publishedYear\n        authors {\n          name\n          age\n          addedAt\n          books {\n            name\n            publisher\n            publishedYear\n          }\n        }\n      }\n    }\n  ","variables":{"authorName":"Test Author","book":{"name":"Some book lad","publisher":"Penguin","publishedYear":1999}}}'
+        >
 {
   req: gql`
     mutation addBook($authorName: String!, $book: BookInput!) {
@@ -383,16 +390,16 @@ subscription numbers($from: Int, $to: Int) {
     <script type="text/javascript" src="https://unpkg.com/@zeusdeux/serverless-graphql"></script>
     <script type="text/javascript">
       function getQueryRunner() {
-        const AuthorDB = {};
-        const BookDB = {};
+        const AuthorDB = {}
+        const BookDB = {}
 
-        const gql = String.raw;
+        const gql = String.raw
 
         const delay = ms => {
           return new Promise(res => {
-            setTimeout(res, ms);
-          });
-        };
+            setTimeout(res, ms)
+          })
+        }
 
         const typeDefs = gql`
           type Query {
@@ -434,24 +441,24 @@ subscription numbers($from: Int, $to: Int) {
           type Subscription {
             numbers(from: Int, to: Int): Int!
           }
-        `;
+        `
 
         const resolvers = {
           Query: {
             authors() {
-              return Object.values(AuthorDB);
+              return Object.values(AuthorDB)
             },
             async author(_, { name }) {
-              await delay(2000);
+              await delay(2000)
 
               if (name in AuthorDB) {
-                return AuthorDB[name];
+                return AuthorDB[name]
               }
 
-              throw new Error(`No author named ${name} found in database`);
+              throw new Error(`No author named ${name} found in database`)
             },
             books() {
-              return Object.values(BookDB);
+              return Object.values(BookDB)
             }
           },
 
@@ -459,9 +466,9 @@ subscription numbers($from: Int, $to: Int) {
 
           Mutation: {
             async addAuthor(_, { author }) {
-              await delay(2500);
+              await delay(2500)
 
-              const { name, age } = author;
+              const { name, age } = author
 
               // add author if it doesn't exist in DB
               if (!(name in AuthorDB)) {
@@ -470,46 +477,46 @@ subscription numbers($from: Int, $to: Int) {
                   age,
                   addedAt: new Date().toISOString(),
                   books: []
-                };
+                }
               }
 
-              return AuthorDB[name];
+              return AuthorDB[name]
             },
 
             async addBookForAuthor(
               _,
               { authorName, book: { name: bookName, publisher, publishedYear } }
             ) {
-              await delay(2500);
+              await delay(2500)
 
               if (authorName in AuthorDB) {
-                const author = AuthorDB[authorName];
-                const authorHasBook = !!author.books.filter(book => book.name === bookName).length;
-                const bookIdx = `${bookName}:${publisher}:${publishedYear}`;
-                const book = BookDB[bookIdx];
+                const author = AuthorDB[authorName]
+                const authorHasBook = !!author.books.filter(book => book.name === bookName).length
+                const bookIdx = `${bookName}:${publisher}:${publishedYear}`
+                const book = BookDB[bookIdx]
 
                 if (authorHasBook) {
-                  return book;
+                  return book
                 }
 
                 if (book) {
-                  book.authors.push(author);
-                  BookDB[bookIdx] = book;
+                  book.authors.push(author)
+                  BookDB[bookIdx] = book
                 } else {
                   BookDB[bookIdx] = {
                     name: bookName,
                     publisher,
                     publishedYear,
                     authors: [author]
-                  };
+                  }
                 }
 
-                author.books.push(BookDB[bookIdx]);
+                author.books.push(BookDB[bookIdx])
 
-                return BookDB[bookIdx];
+                return BookDB[bookIdx]
               }
 
-              throw new Error(`Author with name ${name} not found`);
+              throw new Error(`Author with name ${name} not found`)
             }
           },
 
@@ -518,7 +525,7 @@ subscription numbers($from: Int, $to: Int) {
               subscribe: (_, { from, to }) => generateNumbers(from, to)
             }
           }
-        };
+        }
 
         async function* generateNumbers(from = 0, to = 10) {
           let x = from
@@ -531,71 +538,99 @@ subscription numbers($from: Int, $to: Int) {
           }
         }
 
-        return serverlessGql.getQueryRunner({ typeDefs, resolvers });
+        return serverlessGql.getQueryRunner({ typeDefs, resolvers })
       }
 
       function main() {
-        const $form = document.getElementById("input-form");
-        const $input = document.getElementById("request");
-        const $variables = document.getElementById("variables");
-        const $output = document.getElementById("result");
-        const $queries = document.querySelector(".queries");
-        const executeQuery = getQueryRunner();
+        const $form = document.getElementById('input-form')
+        const $input = document.getElementById('request')
+        const $variables = document.getElementById('variables')
+        const $output = document.getElementById('result')
+        const $queries = document.querySelector('.queries')
+        const executeQuery = getQueryRunner()
 
-        $queries.addEventListener("click", e => {
+        $queries.addEventListener('click', e => {
           if (e.target instanceof HTMLPreElement) {
-            const parsedRequest = JSON.parse(e.target.dataset.jsonpayload || `{ "req": ${JSON.stringify(e.target.innerText)}}`)
+            const parsedRequest = JSON.parse(
+              e.target.dataset.jsonpayload || `{ "req": ${JSON.stringify(e.target.innerText)}}`
+            )
 
             $input.value = parsedRequest.req
             $variables.value = JSON.stringify(parsedRequest.variables, null, 2) || ''
-            $output.value = "";
+            $output.value = ''
 
             window.scrollTo({
               top: 0,
               left: 0,
-              behavior: "smooth"
-            });
+              behavior: 'smooth'
+            })
           }
-        });
+        })
 
-        $form.addEventListener("submit", async e => {
-          e.preventDefault();
+        window.addEventListener('load', () => {
+          const queryParams = new URLSearchParams(document.location.search)
+          const req = queryParams.get('req')
+          const variables = queryParams.get('variables')
+
+          $input.value = req ? req : ''
+          $variables.value = variables ? variables : ''
+        })
+
+        $form.addEventListener('submit', async e => {
+          e.preventDefault()
+
+          const request = $input.value.trim()
+          const variables = $variables.value.trim()
+
+          // set req and variables in URL as query params
+          const queryParams = new URLSearchParams(document.location.search)
+          queryParams.set('req', request)
+          variables && queryParams.set('variables', variables)
+          window.history.pushState({}, '', `${document.location.origin}?${queryParams}`)
 
           try {
-            const query = $input.value;
-            const variables = $variables.value.length ? JSON.parse($variables.value) : null
+            const parsedVariables = $variables.value.length
+                                  ? JSON.parse($variables.value.trim())
+                                  : null
 
-            $output.value = "Loading...";
+            $output.value = 'Loading...'
 
             const interval = setInterval(() => {
-              if ($output.value === "Loading...") {
-                $output.value = "Loading";
+              if ($output.value === 'Loading...') {
+                $output.value = 'Loading'
               } else {
-                $output.value += ".";
+                $output.value += '.'
               }
-            }, 500);
-            const result = await executeQuery({ req: query, variables });
+            }, 500)
+            const result = await executeQuery({ req: request, variables: parsedVariables })
 
-            clearInterval(interval);
+            clearInterval(interval)
 
             if (typeof result[Symbol.asyncIterator] === 'function') {
               const tStart = Math.floor(Date.now() / 1000)
-              const timeFmtr = Intl.RelativeTimeFormat ? new Intl.RelativeTimeFormat('en', { style: 'narrow' }) : void 0
+              const timeFmtr = Intl.RelativeTimeFormat
+                             ? new Intl.RelativeTimeFormat('en', { style: 'narrow' })
+                             : void 0
               for await (const res of result) {
                 const tNow = Math.floor(Date.now() / 1000)
 
                 $output.value += JSON.stringify(res, null, 2)
-                $output.value += '\n' + `---- ${timeFmtr ? timeFmtr.format(tStart - tNow, 'second') : '------------'} ----` + '\n';
+                $output.value +=
+                  '\n' +
+                  `---- ${
+                    timeFmtr ? timeFmtr.format(tStart - tNow, 'second') : '------------'
+                  } ----` +
+                  '\n'
               }
             } else {
-              $output.value = JSON.stringify(result, null, 2);
+              $output.value = JSON.stringify(result, null, 2)
             }
-          } catch(e) {
+          } catch (e) {
             alert(e.message)
           }
-        });
+        })
       }
-      main();
+      main()
     </script>
   </body>
 </html>
