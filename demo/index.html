@@ -580,12 +580,12 @@ subscription numbers($from: Int, $to: Int) {
 
             if (typeof result[Symbol.asyncIterator] === 'function') {
               const tStart = Math.floor(Date.now() / 1000)
-              const timeFmtr = new Intl.RelativeTimeFormat('en', { style: 'narrow' });
+              const timeFmtr = Intl.RelativeTimeFormat ? new Intl.RelativeTimeFormat('en', { style: 'narrow' }) : void 0
               for await (const res of result) {
                 const tNow = Math.floor(Date.now() / 1000)
 
                 $output.value += JSON.stringify(res, null, 2)
-                $output.value += '\n' + `---- ${timeFmtr.format(tStart - tNow, 'second')} ----` + '\n';
+                $output.value += '\n' + `---- ${timeFmtr ? timeFmtr.format(tStart - tNow, 'second') : '------------'} ----` + '\n';
               }
             } else {
               $output.value = JSON.stringify(result, null, 2);
