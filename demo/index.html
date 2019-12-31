@@ -215,6 +215,10 @@
     addAuthor(author: AuthorInput!): Author!
     addBookForAuthor(authorName: String!, book: BookInput): Book!
   }
+
+  type Subscription {
+    numbers(from: Int, to: Int): Int!
+  }
           </pre>
         </div>
       </div>
