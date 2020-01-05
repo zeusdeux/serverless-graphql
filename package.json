@@ -12,8 +12,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rimraf dist",
     "bundle": "rollup -c ./rollup.config.js",
+    "lint": "eslint .",
     "check-peers": "[[ -d node_modules/graphql ]] && echo 'peerDeps found!' || { echo '---- Maybe install the peerDeps as they are needed by the UMD build? ----'; echo; exit 1; }",
-    "build": "npm run check-peers && npm run clean && npm run bundle",
+    "build": "npm run lint && npm run check-peers && npm run clean && npm run bundle",
     "prepack": "npm run build",
     "watch": "npm run check-peers && rollup -c ./rollup.config.js -w",
     "publish-package": "npm run build && np --no-cleanup --no-tests"
@@ -30,6 +31,7 @@
     "@rollup/plugin-commonjs": "^11.0.0",
     "@rollup/plugin-node-resolve": "^6.0.0",
     "@rollup/plugin-replace": "^2.3.0",
+    "eslint": "^6.8.0",
     "np": "^5.2.1",
     "prettier": "1.19.1",
     "rimraf": "^3.0.0",

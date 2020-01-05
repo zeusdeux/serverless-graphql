@@ -5,6 +5,7 @@
 !rollup.config*
 !.nowignore
 !now.json
+!.eslintrc.js
 !Readme*
 !types.d.ts
 !demo.gif
