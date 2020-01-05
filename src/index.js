@@ -66,23 +66,21 @@ function isAsyncIterable(obj) {
 export function getQueryRunner(args) {
   const schema = args.schema ? args.schema : makeExecutableSchema(args)
 
-  return async requestStringOrObject => {
-    const { req, variables, root, context, operationToRun } = validateRequest(requestStringOrObject)
-    const parsedReqAsDocument = parse(req)
+  return {
+    graphql: async requestStringOrObject => {
+      const { req, variables, root, context, operationToRun } = validateRequest(
+        requestStringOrObject
+      )
 
-    // figure out if subscription
-    const subscriptionOperations = parsedReqAsDocument.definitions.filter(
-      d => d.operation === 'subscription'
-    )
-    const chosenOperationToRunIsSubscription =
-      operationToRun && subscriptionOperations.find(s => s.name.value === operationToRun)
+      return graphql(schema, req, root, context, variables, operationToRun)
+    },
 
-    // if only one definition and it's a subscription
-    // or if many definitions and the operationToRun names a subscription operation
-    if (
-      (parsedReqAsDocument.definitions.length === 1 && subscriptionOperations.length) ||
-      chosenOperationToRunIsSubscription
-    ) {
+    subscribe: async requestStringOrObject => {
+      const { req, variables, root, context, operationToRun } = validateRequest(
+        requestStringOrObject
+      )
+      const parsedReqAsDocument = parse(req)
+
       // Note that we pass the _parsed_ request here since that's what subscribe expects
       // Also, return type of subscribe is
       // Promise<AsyncIterableIterator<ExecutionResult<T>> | ExecutionResult<T>>
@@ -130,10 +128,6 @@ export function getQueryRunner(args) {
       // return as-is when the result is an async iterable
       return asyncIterableOrExecutionResult
     }
-
-    // Not a subscription request, use normal graphql function
-    // Note that we pass the req as a string here.
-    return graphql(schema, req, root, context, variables, operationToRun)
   }
 }
 
