@@ -4,7 +4,7 @@ Run GraphQL on any schema directly from anywhere without the need for a graphql 
 
 Supports `Query`, `Mutation` _and_ `Subscription` types.
 
-This is _super_ experimental and just fun mostly.
+This is _super_ experimental.
 
 ## Installation
 
@@ -18,7 +18,11 @@ npm install @zeusdeux/serverless-graphql
 
 ### `makeExecutableSchema`
 
-This function accepts an `options` object with two properties for now.
+This function accepts an `options` object with two properties for now and returns a `GraphQLSchema`.
+
+#### Return type
+
+`GraphQLSchema`
 
 e.g.,
 
@@ -39,7 +43,8 @@ const resolvers = {
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 
-// this schema can then be consumed by other packages such as apollo-server, etc to run a dev server for example.
+// this schema can then be consumed by other packages
+// such as apollo-server, etc to run a dev server for example.
 ```
 
 #### `options.typeDefs`
@@ -89,13 +94,14 @@ type Mutation {
 #### `options.resolvers`
 
 This an object contain the resolvers for the types provided in the `typeDefs`. If any resolver is
-missing, the default resolver is used. The default resolver comes from `graphql` package, which is
-basically an identity function per field in a type.
+missing, the
+[default resolver](https://www.apollographql.com/docs/graphql-tools/resolvers/#default-resolver) is
+used.
 
 The resolver function can also be `async` and use the `async/await` syntax.
 
-If a resolver throws an error, the query execution is stopped and the error is returned to the user
-in the `errors` key of the reponse.
+If a resolver throws an error, the query execution is aborted and the error is returned to the user
+in the `errors` key of the response.
 
 A working example matching the schema above is provided below.
 
@@ -126,7 +132,7 @@ const resolvers = {
     }
   },
 
-  // Author: {}, // not providing this let's us use the default resolvers
+  // Author: {}, // not providing this lets us use the default resolvers
 
   Mutation: {
     addAuthor(_, { author }) {
@@ -183,11 +189,49 @@ const resolvers = {
 
 ### `getQueryRunner`
 
-This function accepts the same options as `makeExecutableSchema` and returns a function which
-accepts a GraphQL query to execute on the provided schema (typedefs + resolvers).
+This function accepts the same options as [`makeExecutableSchema`](#makeexecutableschema) or an
+object containing a `GraphQLSchema` i.e., `{ schema: GraphQLSchema }`. It returns an object with two
+properties, `graphql` and `subscribe`.
 
-In lieu of and object containing `{ typeDefs, resolvers }`, this function also accepts an object
-containing a `GraphQLSchema` i.e., `{ schema: GraphQLSchema }`.
+#### Return type
+
+```ts
+type GetQueryRunnerResult<T = { [key: string]: any }> = {
+  graphql: (request: string | QueryRunnerOptions) => Promise<ExecutionResult<T>>
+  subscribe: (request: string | QueryRunnerOptions) => Promise<AsyncIterable<ExecutionResult<T>>>
+}
+
+type QueryRunnerOptions = {
+  req: string
+  variables?: { [key: string]: any }
+  root?: any
+  context?: any
+  operationToRun?: string
+}
+
+type ExecutionResult<T> = {
+  errors?: ReadonlyArray<GraphQLError>
+  data?: T | null
+}
+```
+
+Both functions returned by `getQueryRunner` can be provided with the operation as a string or as a
+string assigned to `req` property of an object. The object also supports `variables` which let you
+use graphql variables, `context` which is passed to all resolvers, `root` value which gets passed as
+the root value to the executor and `operationToRun` which can be used to select which operation to
+run if many are provided in the request (`req`) string.
+
+The functions on the returned object are explained below.
+
+#### `graphql`
+
+This function accepts a GraphQL request to execute on the given schema or schema generated from
+`{ typeDefs, resolvers }` (i.e., the args to `getQueryRunner`). It should _only be used for queries
+and mutations_.
+
+It returns a `Promise` which resolves to an object containing `data` and `errors` properties, _one_
+of which is usually populated. `data` maps to the resolved response. `errors` contains errors that
+occured during execution. This maps to the `ExecutionResult` type shown above.
 
 e.g.,
 
@@ -206,24 +250,19 @@ const resolvers = {
   }
 }
 
-const runQuery = getQueryRunner({ typeDefs, resolvers })
+const { graphql: runQuery } = getQueryRunner({ typeDefs, resolvers })
 
 runQuery('{ hello }').then(({ data }) => console.log(data)) // logs {hello: "world!"}
 
 // or
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
-const runQuery = getQueryRunner({ schema })
+const { graphql: runQuery } = getQueryRunner({ schema })
 
 runQuery('{ hello }').then(({ data }) => console.log(data)) // logs {hello: "world!"}
 ```
 
-The function returned by `getQueryRunner` can be provided with the operation as a string as shown in
-the example above. But not only that, it also supports `variables`, `context` which is passed to all
-resolvers, `root` value which gets passed as the root value to the executor and `operationToRun`
-which can be used to selection which operation to run if many are provided in the request string.
-
-#### Using variables with the query runner
+An example with the `variables` option being used
 
 ```js
 import { getQueryRunner, gql } from '@zeusdeux/serverless-graphql'
@@ -250,7 +289,7 @@ const resolvers = {
   }
 }
 
-const runQuery = getQueryRunner({ typeDefs, resolvers })
+const { graphql: runQuery } = getQueryRunner({ typeDefs, resolvers })
 
 runQuery({
   req: gql`
@@ -264,12 +303,23 @@ runQuery({
 }).then(({ data }) => console.log(data)) // logs server time in ISO format
 ```
 
-When a `subscription` is requested using the function returned by `getQueryRunner`, the request
-result is an async iterable which can be use with a
-[for-await...of](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of#Iterating_over_async_iterables)
-loop.
+#### `subscribe`
 
-#### `subscription` request example
+This function accepts a GraphQL _`subscription`_ request to execute on the given schema or schema
+generated from `{ typeDefs, resolvers }` (i.e., the args to `getQueryRunner`). It should _only be
+used for `subscription` requests_.
+
+It returns a `Promise` that resolves to an
+[`async iterable`](https://javascript.info/async-iterators-generators#async-iterables) that can be
+consumed using the new
+[`for await...of`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of)
+syntax for example.
+
+The values generated by the async iterable have the same shape and type as those returned by the
+`graphql` function mentioned above. I.e., `Promise`s that resolve to `{ data?, errors? }` aka
+`ExecutionResult`.
+
+e.g.,
 
 ```js
 import { getQueryRunner, gql } from '@zeusdeux/serverless-graphql'
@@ -312,9 +362,9 @@ async function* generateNumbers() {
 }
 
 async function main() {
-  const q = getQueryRunner({ typeDefs, resolvers })
+  const { subscribe } = getQueryRunner({ typeDefs, resolvers })
 
-  for await (let x of await q('subscription { getNumber }')) {
+  for await (let x of await subscribe('subscription { getNumber }')) {
     console.log('Number:', x) // prints Number: 1, Number: 2, and so on
   }
 }
