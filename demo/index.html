@@ -32,7 +32,7 @@
       }
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
-        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
       }
       main {
         padding: 2rem 5rem;
@@ -551,7 +551,7 @@ subscription numbers($from: Int, $to: Int) {
         const $variables = document.getElementById('variables')
         const $output = document.getElementById('result')
         const $queries = document.querySelector('.queries')
-        const executeQuery = getQueryRunner()
+        const { graphql: executeQuery, subscribe } = getQueryRunner()
 
         $queries.addEventListener('click', e => {
           if (e.target instanceof HTMLPreElement) {
@@ -594,8 +594,8 @@ subscription numbers($from: Int, $to: Int) {
 
           try {
             const parsedVariables = $variables.value.length
-                                  ? JSON.parse($variables.value.trim())
-                                  : null
+              ? JSON.parse($variables.value.trim())
+              : null
 
             $output.value = 'Loading...'
 
@@ -606,15 +606,13 @@ subscription numbers($from: Int, $to: Int) {
                 $output.value += '.'
               }
             }, 500)
-            const result = await executeQuery({ req: request, variables: parsedVariables })
 
-            clearInterval(interval)
-
-            if (typeof result[Symbol.asyncIterator] === 'function') {
+            if (request.includes('subscription ')) {
+              const result = await subscribe({ req: request, variables: parsedVariables })
               const tStart = Math.floor(Date.now() / 1000)
               const timeFmtr = Intl.RelativeTimeFormat
-                             ? new Intl.RelativeTimeFormat('en', { style: 'narrow' })
-                             : void 0
+                ? new Intl.RelativeTimeFormat('en', { style: 'narrow' })
+                : void 0
               for await (const res of result) {
                 const tNow = Math.floor(Date.now() / 1000)
 
@@ -627,8 +625,11 @@ subscription numbers($from: Int, $to: Int) {
                   '\n'
               }
             } else {
+              const result = await executeQuery({ req: request, variables: parsedVariables })
               $output.value = JSON.stringify(result, null, 2)
             }
+
+            clearInterval(interval)
           } catch (e) {
             alert(e.message)
           }
