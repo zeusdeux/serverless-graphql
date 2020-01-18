@@ -1,4 +1,4 @@
-import { GraphQLSchema, ExecutionResult, subscribe, graphql } from 'graphql'
+import { ExecutionResult, GraphQLSchema } from 'graphql'
 
 export type ResolverFunction = (...args: any[]) => any
 
