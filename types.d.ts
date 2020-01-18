@@ -21,13 +21,17 @@ export interface QueryRunnerOptions {
   operationToRun?: string
 }
 
-export interface GetQueryRunnerResult<T> {
-  graphql: (request: string | QueryRunnerOptions) => Promise<ExecutionResult<T>>
-  subscribe: (request: string | QueryRunnerOptions) => Promise<AsyncIterable<ExecutionResult<T>>>
+export interface GetQueryRunnerResult<Query = {}, Mutation = {}, Subscription = {}> {
+  graphql: <T>(
+    request: string | QueryRunnerOptions
+  ) => Promise<ExecutionResult<keyof T extends keyof Mutation | keyof Query ? T : never>>
+  subscribe: <T>(
+    request: string | QueryRunnerOptions
+  ) => Promise<AsyncIterable<ExecutionResult<keyof T extends keyof Subscription ? T : never>>>
 }
 
-export function getQueryRunner<T = { [key: string]: any }>(
+export function getQueryRunner<Query = {}, Mutation = {}, Subscription = {}>(
   opts: MakeExecutableSchemaOptions | { schema: GraphQLSchema }
-): GetQueryRunnerResult<T>
+): GetQueryRunnerResult<Query, Mutation, Subscription>
 export function makeExecutableSchema(opts: MakeExecutableSchemaOptions): GraphQLSchema
 export const gql: typeof String.raw
